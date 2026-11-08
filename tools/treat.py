@@ -1,5 +1,5 @@
 """KYOTO NOTES の画像加工：指定パレットへの減色＋色面の整理（グラデーション除去）。
-使い方: python3 treat.py 入力 出力.jpg [幅]"""
+使い方: python3 treat.py 入力 出力.png [幅]"""
 import sys
 from PIL import Image, ImageFilter
 import numpy as np
@@ -29,6 +29,11 @@ def treat(src,dst,width=1400):
     idx=np.where(warm&(mx>=0.76)&(sat>=0.40),names.index('yellow'),idx)
     out=Image.fromarray(P[idx].astype('uint8'))
     out=out.filter(ImageFilter.ModeFilter(7))             # 境界の粒を消して面を整える
-    out.save(dst,quality=86,optimize=True,progressive=True,subsampling=0)
+    if dst.lower().endswith('.png'):                      # 色数が少ないのでPNGが軽くて正確
+        pal=Image.new('P',(1,1)); flat=[int(c) for n in names for c in PAL[n]]
+        pal.putpalette(flat+[0]*(768-len(flat)))           # 指定パレットに厳密に固定
+        out.quantize(palette=pal,dither=Image.Dither.NONE).save(dst,optimize=True)
+    else:
+        out.save(dst,quality=86,optimize=True,progressive=True,subsampling=0)
 if __name__=='__main__':
     treat(sys.argv[1],sys.argv[2],int(sys.argv[3]) if len(sys.argv)>3 else 1400)

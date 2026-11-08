@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,600;1,500&family=Geist:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<script>try{if(Date.now()>=Date.UTC(2026,10,30,15,0))document.documentElement.className+=" closed"}catch(e){}</script>
 <style>
 /* Layout: 雑誌の表紙→特集見開き。表紙は大きな英字タイトルと色面、本文は細い罫線で区切った時刻表。
    一つの視覚世界（クリーム地のカルチャー誌）に絞るため、ライトテーマ単一で設計。 */
@@ -45,6 +46,13 @@ a:hover{color:var(--pink)}
 .en{font-family:var(--display);font-weight:900;letter-spacing:-.035em;line-height:.92}
 .lbl,.cat,.issue{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
 
+/* ---- 公開終了（2026-12-01 00:00 JST 以降） ---- */
+.closed-note{display:none}
+.closed .wrap{display:none}
+.closed .closed-note{display:flex;flex-direction:column;gap:10px;max-width:40rem;margin:0 auto;padding-block:30vh 0}
+.closed-note .en{font-size:clamp(44px,12vw,80px);margin:0}
+.closed-note p{margin:0;font-weight:700}
+
 /* ---- COVER ---- */
 .cover{display:flex;flex-direction:column;gap:20px;padding-block:20px 28px}
 .masthead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:8px}
@@ -54,11 +62,11 @@ a:hover{color:var(--pink)}
 .cover h1{margin:0;font-size:clamp(56px,17vw,132px);color:var(--ink);display:flex;flex-direction:column}
 .cover h1 .amp{color:var(--pink)}
 .kicker{margin:14px 0 0;font-weight:900;font-size:clamp(20px,5.4vw,28px);line-height:1.35;letter-spacing:.02em}
-.sub{margin:6px 0 0;font-size:14px;color:var(--muted)}
+.cover .sub{margin:6px 0 0;font-size:14px;color:var(--muted)}
 .cover-art{margin:0;position:relative;aspect-ratio:3/2;max-width:100%;background:var(--navy);overflow:hidden;order:-1}
 .cover-art svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .cover-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.cover-art figcaption{position:absolute;left:10px;bottom:8px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.16em;color:var(--paper)}
+.cover-art figcaption{position:absolute;right:12px;bottom:10px;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.16em;color:var(--paper)}
 .facts{margin:0;display:grid;grid-template-columns:minmax(0,1fr);border-top:1px solid var(--ink)}
 .facts div{display:grid;grid-template-columns:4.6rem minmax(0,1fr);gap:10px;padding-block:9px;border-bottom:1px solid var(--rule)}
 .facts dt{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.16em;padding-top:4px}
@@ -128,7 +136,7 @@ summary:hover .tog{background:var(--ink);color:var(--paper)}
 .mv .sub{display:block;font-size:12.5px}
 
 /* 当日ハイライト */
-.st.is-now{background:linear-gradient(var(--paper),var(--paper));box-shadow:inset 6px 0 0 var(--pink);padding-left:14px}
+.st.is-now{box-shadow:inset 6px 0 0 var(--pink);padding-left:14px}
 .st.is-now .t{color:var(--pink)}
 .st.is-now .tag{background:var(--pink);color:var(--ink)}
 .st.is-next .tag{border:1.5px solid var(--ink)}
@@ -187,8 +195,8 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
   .cover-art{grid-column:1/13;grid-row:1}
   .cover-type{grid-column:8/13;grid-row:1;align-self:center;position:relative;z-index:1;padding-right:5%}
   .cover h1{color:var(--paper);font-size:clamp(48px,7vw,96px)}
-  .kicker{color:var(--paper)}
-  .sub{color:#D8D4CA}
+  .cover .kicker{color:var(--paper)}
+  .cover .sub{color:#D8D4CA}
   .facts{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:24px}
   .day{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;align-items:start}
   .spread{grid-column:1/5;position:sticky;top:calc(env(safe-area-inset-top,0px) + 96px)}
@@ -210,13 +218,14 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
   .cover h1 span,.kicker{animation:rise .5s ease-out both}
   .cover h1 span:nth-child(2){animation-delay:.06s}
   .kicker{animation-delay:.12s}
-  @keyframes rise{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes rise{from{transform:translateY(6px)}to{transform:none}}
 }
 </style>
 </head>
 <body>
 
 
+<div class="closed-note" role="status"><p class="en">THANK YOU<span style="color:var(--pink)">.</span></p><p>この旅のしおりは、2026年11月末で公開を終了しました。</p></div>
 <div class="wrap">
   <header class="cover">
     <div class="masthead"><span class="name">KYOTO NOTES</span><span class="issue">ISSUE 001 / NOVEMBER 2026</span></div>
@@ -227,7 +236,7 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
         <p class="sub">京都で一泊。急がず、寄り道は多めに。</p>
       </div>
       <figure class="cover-art">
-        <img src="cover.jpg" alt="表紙のイラスト。紺のジャケットと眼鏡の人物が、右上を見上げている。" width="1400" height="933">
+        <img src="cover.png" alt="表紙のイラスト。紺のジャケットと眼鏡の人物が、右上を見上げている。" width="1400" height="933">
         <figcaption>AUTUMN 2026 / KYOTO</figcaption>
       </figure>
     </div>
