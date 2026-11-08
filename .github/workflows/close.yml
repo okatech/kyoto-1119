@@ -1,5 +1,5 @@
 name: 公開終了（2026年12月1日）
-# 日本時間 2026-12-01 0:05 に、しおりを「公開終了」ページへ差し替え、表紙画像などを削除する。
+# 日本時間 2026-12-01 0:05 に、しおりを「公開終了」ページだけにし、過去の版の履歴も消す。
 on:
   schedule:
     - cron: '5 15 30 11 *'   # UTC 11/30 15:05 = 日本時間 12/1 0:05
@@ -11,14 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 公開終了ページに差し替える
+      - name: 公開終了ページだけの新しい履歴に置き換える
         run: |
           if [ "${{ github.event_name }}" = "schedule" ] && [ "$(date -u +%Y)" != "2026" ]; then exit 0; fi
-          cp closed.html index.html
-          git rm -q --ignore-unmatch cover.png cover.jpg
-          git rm -rq --ignore-unmatch tools
+          mkdir -p /tmp/keep && cp closed.html /tmp/keep/index.html && cp .github/workflows/close.yml /tmp/keep/close.yml
+          git checkout -q --orphan closed
+          git rm -rfq .
+          cp /tmp/keep/index.html index.html
+          touch .nojekyll
+          printf '# 京都 11.19–20\n\n公開期間（2026年11月末まで）が終了したため、内容は削除しました。\n' > README.md
+          mkdir -p .github/workflows && cp /tmp/keep/close.yml .github/workflows/close.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "公開期間終了：しおりを公開終了ページに差し替え" || exit 0
-          git push
+          git commit -q -m "公開期間終了：内容と履歴を削除"
+          git push -f origin closed:main
