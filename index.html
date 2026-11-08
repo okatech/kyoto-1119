@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#006423">
+<meta name="robots" content="noindex">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>京都 11.19–20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@700&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: 時刻表のような一本の柱。左に時刻、右に予定。名所だけが「札」(カード)になり、移動は柱に寄り添う細い注記。 */
+:root{
+  --bg:#f4f8f3;        /* WithGreen 背景ソフト */
+  --surface:#ffffff;
+  --ink:#1a1a1a;
+  --muted:#5a655c;
+  --line:#e3ebe3;
+  --shu:#006423;       /* WithGreen コーポレートグリーン */
+  --shu-wash:#e6f1e8;
+  --kin:#2a8b48;       /* WithGreen ライトグリーン */
+  --mincho:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  --sans:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  --num:"BIZ UDGothic","Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  --tc:3.3rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1611;--surface:#152019;--ink:#eef3ee;--muted:#a3b2a6;--line:#2a3a2f;
+    --shu:#5cc27c;--shu-wash:#12301d;--kin:#8fd3a2;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1611;--surface:#152019;--ink:#eef3ee;--muted:#a3b2a6;--line:#2a3a2f;
+  --shu:#5cc27c;--shu-wash:#12301d;--kin:#8fd3a2;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 40px;
+  -webkit-text-size-adjust:100%;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:34rem;margin:0 auto}
+a{color:var(--shu)}
+:focus-visible{outline:2px solid var(--shu);outline-offset:2px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---- 冒頭 ---- */
+.top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:end;padding-block:22px 16px}
+.top h1{writing-mode:vertical-rl;font-family:var(--mincho);font-weight:800;font-size:46px;line-height:1;letter-spacing:.06em;color:var(--shu);margin:0}
+.meta{display:flex;flex-direction:column;gap:8px;min-width:0}
+.dates{margin:0;font-size:14px;color:var(--muted);line-height:1.5}
+.dates b{font-family:var(--num);font-weight:700;color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
+.meet{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 12px;align-items:baseline;border-top:1px solid var(--line);padding-top:8px}
+.meet .lbl{font-size:12px;font-weight:700;color:var(--shu);letter-spacing:.1em}
+.meet .when{font-family:var(--num);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums;line-height:1.3}
+.meet .where{grid-column:2;font-size:14px}
+.meet .where a{font-size:13px;font-weight:700;margin-left:6px;white-space:nowrap}
+
+/* ---- sticky：日付タブ＋次の予定 ---- */
+.bar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);
+  box-shadow:0 0 0 100vmax var(--bg),0 1px 0 100vmax var(--line);
+  clip-path:inset(0 -100vmax -1px);
+}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tab{display:flex;flex-direction:column;gap:1px;min-height:52px;padding:9px 2px 8px;text-decoration:none;color:var(--muted);border-bottom:3px solid transparent;min-width:0}
+.tab b{font-family:var(--num);font-weight:700;font-size:18px;line-height:1.2;font-variant-numeric:tabular-nums}
+.tab b span{font-family:var(--sans);font-size:14px;margin-left:3px}
+.tab small{font-size:12px;line-height:1.4}
+.tab[aria-current="true"]{color:var(--ink);border-bottom-color:var(--shu)}
+.tab:focus-visible{outline-offset:-2px}
+.next{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-block:0 10px;padding:8px 12px;border-radius:8px;background:var(--shu-wash);color:var(--ink);text-decoration:none;font-weight:700;line-height:1.45}
+.next .lbl{color:var(--shu);font-size:13px}
+.next .nt{font-family:var(--num);font-variant-numeric:tabular-nums}
+
+/* ---- 日ごとの予定 ---- */
+.day{display:flex;flex-direction:column;gap:12px;padding-top:20px;scroll-margin-top:72px}
+.day h2{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;font-family:var(--mincho);font-weight:800;font-size:23px;line-height:1.35;text-wrap:balance}
+.day h2 .d{font-family:var(--num);font-weight:700;font-size:14px;color:var(--kin);font-variant-numeric:tabular-nums}
+
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;position:relative}
+.tl::before{content:"";position:absolute;left:calc(var(--tc) + 10px);top:14px;bottom:14px;width:1px;background:var(--line)}
+.st{display:grid;grid-template-columns:var(--tc) minmax(0,1fr);column-gap:22px;position:relative;padding-block:5px}
+.st::before{content:"";position:absolute;left:calc(var(--tc) + 6px);top:19px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1.5px solid var(--muted)}
+.t{font-family:var(--num);font-weight:700;font-size:17px;line-height:1.3;font-variant-numeric:tabular-nums;text-align:right;padding-top:12px;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.tag{font-family:var(--sans);font-size:11px;font-weight:700;line-height:1;padding:3px 5px;border-radius:4px;letter-spacing:.06em}
+
+/* 名所：札（カード） */
+.spot::before{border-radius:2px;background:var(--ink);border-color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-width:0}
+summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px 8px;cursor:pointer;list-style:none;border-radius:10px}
+summary::-webkit-details-marker{display:none}
+summary:focus-visible{outline-offset:-2px}
+.name{font-family:var(--mincho);font-weight:700;font-size:19px;line-height:1.4;text-wrap:balance}
+.hook{grid-column:1;font-size:14px;line-height:1.6;color:var(--muted)}
+.tog{grid-column:2;grid-row:1/3;align-self:center;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);position:relative;color:var(--shu)}
+.tog::before,.tog::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.5px;background:currentColor;transform:translate(-50%,-50%)}
+.tog::after{transform:translate(-50%,-50%) rotate(90deg)}
+details[open] .tog::after{transform:translate(-50%,-50%) rotate(0deg)}
+.detail{display:flex;flex-direction:column;gap:10px;margin:0 12px;padding-block:10px 4px;border-top:1px dashed var(--line);font-size:14px;line-height:1.75}
+.detail h3{margin:0 0 2px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--kin)}
+.detail p{margin:0}
+.detail ul{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:4px}
+.detail li::marker{color:var(--shu)}
+.foot{padding:2px 12px 8px}
+.map{display:inline-flex;align-items:center;min-height:32px;font-size:13px;font-weight:700;text-underline-offset:3px}
+
+/* 食事・手続きなど：札にしない */
+.plain .name2{font-weight:700;font-size:16px;line-height:1.4;padding-top:11px}
+.plain .note{margin:0;font-size:14px;color:var(--muted);line-height:1.6}
+.plain .note a{font-size:13px;font-weight:700;margin-left:4px;white-space:nowrap}
+
+/* 移動：軽く */
+.mv{padding-block:2px}
+.mv::before{width:5px;height:5px;top:12px;left:calc(var(--tc) + 8px);border:0;background:var(--muted)}
+.mv .t{font-size:14px;color:var(--muted);padding-top:3px}
+.mv .how{font-size:13.5px;line-height:1.55;color:var(--muted);padding-top:3px}
+.mv .dur{color:var(--ink);font-weight:700;white-space:nowrap}
+.mv .sub{display:block;font-size:12.5px}
+
+/* 当日ハイライト */
+.st.is-now::before{background:var(--shu);border-color:var(--shu);box-shadow:0 0 0 4px var(--shu-wash)}
+.st.is-now .t{color:var(--shu)}
+.st.is-now .card{border-color:var(--shu);box-shadow:0 0 0 1px var(--shu)}
+.st.is-now .tag{background:var(--shu);color:var(--surface)}
+.st.is-next::before{border-color:var(--shu);border-width:2px}
+.st.is-next .tag{color:var(--shu);border:1px solid var(--shu)}
+
+/* ---- 寄り道（予定の下に常に見える候補） ---- */
+.yori{grid-column:2;margin-top:8px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.yori-h{font-size:11.5px;font-weight:700;letter-spacing:.12em;color:var(--kin);display:flex;flex-wrap:wrap;gap:0 8px;align-items:baseline}
+.yori-h small{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12px}
+.pick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:7px 10px;border:1px dashed var(--line);border-radius:8px;min-width:0}
+.pick b{font-size:14.5px;line-height:1.45}
+.pick .why{grid-column:1;font-size:13px;color:var(--muted);line-height:1.55}
+.pick a{grid-column:2;grid-row:1/3;align-self:center;font-size:12.5px;font-weight:700;white-space:nowrap;min-height:32px;display:inline-flex;align-items:center}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;line-height:1.5;padding:0 6px;border-radius:999px;margin-left:6px;vertical-align:2px;letter-spacing:.04em;white-space:nowrap}
+.badge.new{background:var(--shu-wash);color:var(--shu)}
+.badge.sns{border:1px solid var(--kin);color:var(--kin)}
+.badge.old{border:1px solid var(--line);color:var(--muted)}
+
+/* ---- 伏見のいま ---- */
+.trend{display:flex;flex-direction:column;gap:14px;padding-top:32px}
+.trend h2{margin:0;font-family:var(--mincho);font-weight:800;font-size:21px}
+.trend .lead{margin:0;font-size:14px;color:var(--muted);line-height:1.7}
+.trend h3{margin:0;font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--kin)}
+.trend p{margin:0;font-size:14px;line-height:1.75}
+.trend .grp{display:flex;flex-direction:column;gap:6px}
+.callout{border:1px solid var(--shu);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:var(--surface)}
+.callout b{color:var(--shu);font-size:13px;letter-spacing:.06em}
+.callout p{font-size:13.5px;line-height:1.7}
+
+/* ---- 物語（年表） ---- */
+.story{display:flex;flex-direction:column;gap:12px;padding-top:32px}
+.story h2{margin:0;font-family:var(--mincho);font-weight:800;font-size:21px}
+.story .lead{margin:0;font-size:14px;color:var(--muted);line-height:1.7}
+.years{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.years li{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:4px 12px;padding-block:10px;border-bottom:1px solid var(--line)}
+.years .y{font-family:var(--num);font-weight:700;font-variant-numeric:tabular-nums;color:var(--shu);font-size:15px;line-height:1.5}
+.years .y small{display:block;font-family:var(--sans);font-weight:500;font-size:11px;color:var(--muted)}
+.years .ev{font-size:14px;line-height:1.65;min-width:0}
+.years .ev b{font-weight:700}
+.years .where{display:inline-block;margin-top:2px;font-size:12px;font-weight:700;color:var(--kin)}
+.side{display:inline-block;font-size:11px;font-weight:700;padding:0 6px;border-radius:4px;margin-right:4px;vertical-align:1px;border:1px solid var(--line);color:var(--muted)}
+.theme-line{margin:0;font-family:var(--mincho);font-weight:700;font-size:15px;line-height:1.6}
+.theme-line a{font-family:var(--sans);font-size:12.5px;font-weight:700;margin-left:6px;white-space:nowrap}
+
+/* ---- 持ち物 ---- */
+.pack{display:flex;flex-direction:column;gap:10px;padding-top:32px}
+.pack h2{margin:0;font-family:var(--mincho);font-weight:800;font-size:21px}
+.pack ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.pack li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:10px;padding-block:9px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.5}
+.pack li::before{content:"";width:9px;height:9px;margin-top:.45em;border:1.5px solid var(--kin);border-radius:2px}
+.pack li span{display:block;font-size:13px;color:var(--muted)}
+
+footer{padding-top:22px;font-size:12.5px;color:var(--muted);line-height:1.6}
+footer ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+
+@media (prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
+  details[open] .detail{animation:open .18s ease-out}
+  .tog::after{transition:transform .18s ease-out}
+  @keyframes open{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <h1>京都</h1>
+    <div class="meta">
+      <p class="dates"><b>11/19</b>（木）〜 <b>11/20</b>（金）<br>2026年 晩秋の一泊、2名</p>
+      <p class="theme-line">徳川の城、志士の宿、新政府軍の寺。幕末の京を歩く一泊。<a href="#story">年表</a></p>
+      <div class="meet">
+        <span class="lbl">集合</span>
+        <span class="when">11/19（木）12:00</span>
+        <span class="where">京都駅 八条口側<a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BA%AC%E9%83%BD%E9%A7%85%20%E5%85%AB%E6%9D%A1%E5%8F%A3" target="_blank" rel="noopener">地図</a></span>
+      </div>
+    </div>
+  </header>
+
+  <div id="tabs-top"></div>
+  <nav class="bar" aria-label="日付の切り替え">
+    <div class="tabs">
+      <a class="tab" href="#d19" data-day="d19"><b>11/19<span>木</span></b><small>伏見の幕末と徳川の城</small></a>
+      <a class="tab" href="#d20" data-day="d20"><b>11/20<span>金</span></b><small>新政府軍の寺と坐禅の朝</small></a>
+    </div>
+    <a class="next" id="next" href="#d19" hidden><span class="lbl">次は</span><span><span id="next-name"></span><span class="nt" id="next-time"></span></span></a>
+  </nav>
+
+  <!-- 11/19 -->
+  <section class="day" id="d19" aria-labelledby="h19">
+    <h2 id="h19"><span class="d">11/19 木</span>伏見の幕末と徳川の城</h2>
+    <ol class="tl">
+      <li class="st plain" data-t="12:00" data-name="京都駅 集合">
+        <div class="t">12:00</div>
+        <div>
+          <div class="name2">京都駅 集合</div>
+          <p class="note">八条口側<a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BA%AC%E9%83%BD%E9%A7%85%20%E5%85%AB%E6%9D%A1%E5%8F%A3" target="_blank" rel="noopener">地図</a></p>
+        </div>
+      </li>
+      <li class="st plain" data-t="12:15" data-name="昼食">
+        <div class="t">12:15</div>
+        <div>
+          <div class="name2">昼食</div>
+          <p class="note">京都駅周辺で、1時間ほどで済ませる。</p>
+        </div>
+      </li>
+      <li class="st mv" data-t="13:10" data-name="移動（伏見桃山へ）">
+        <div class="t">13:10</div>
+        <div class="how">近鉄 京都→桃山御陵前 <span class="dur">約15分</span><span class="sub">大きい荷物は京都駅のコインロッカーへ。</span></div>
+      </li>
+      <li class="st spot" data-t="13:30" data-name="伏見の幕末を歩く">
+        <div class="t">13:30</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">伏見の幕末を歩く</span><span class="hook">龍馬が襲われた宿と、新政府軍と旧幕府軍が撃ち合った町。徒歩25分ほどの道のり。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>1868年1月の鳥羽・伏見の戦いで、薩摩軍（新政府側）は御香宮に本陣を置き、新選組らが立てこもる伏見奉行所を砲撃した。その南の寺田屋は、1866年に坂本龍馬が伏見奉行所の捕り方に襲われた船宿。半日もかからない範囲に、幕府が倒れる直前の現場が並んでいる。</p></div>
+              <div><h3>歩く順番</h3><ul>
+                <li><strong>御香宮神社</strong>：薩摩軍の本陣跡。表門は伏見城の遺構とされる。</li>
+                <li><strong>伏見奉行所跡</strong>：新選組が立てこもり、敗れて炎上した奉行所の跡（いまは石碑）。</li>
+                <li><strong>魚三楼</strong>：新選組と薩摩軍が銃撃戦をした京町通の料亭。玄関の出格子に弾痕が残る。</li>
+                <li><strong>寺田屋</strong>：柱の刀傷と弾痕、龍馬が泊まった「梅ノ間」、お龍が入ったとされる風呂。見学10:00〜16:00（受付15:40まで）、大人600円、月曜は不定休。</li>
+              </ul></div>
+              <div><h3>Tips</h3><ul>
+                <li>寺田屋は最後に。そこから京阪「中書島」駅まで徒歩約5分で、宿へ乗り換えなしで戻れる。</li>
+                <li>魚三楼の弾痕は外から見られる。営業中の料亭なので見学は通りから。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%AF%BA%E7%94%B0%E5%B1%8B%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">寺田屋の地図</a> · <a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%BE%A1%E9%A6%99%E5%AE%AE%E7%A5%9E%E7%A4%BE%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">御香宮の地図</a></div>
+        </div>
+        <div class="yori">
+          <div class="yori-h">寄り道<small>道沿いの酒どころ。どちらも11:00から営業</small></div>
+          <div class="pick"><b>伏水酒蔵小路</b><span class="why">御香宮から歩いてすぐの大手筋。伏見18蔵の酒を、18杯のお猪口で軽い酒から順に飲み進めるきき酒セットが名物</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BC%8F%E6%B0%B4%E9%85%92%E8%94%B5%E5%B0%8F%E8%B7%AF" target="_blank" rel="noopener">地図</a></div>
+          <div class="pick"><b>家守堂</b><span class="why">明治初期のお茶屋の町家を醸造所兼パブに。茶とユズのビール「茶かぶき」。寺田屋に近い。月曜定休</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%AE%B6%E5%AE%88%E5%A0%82%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">地図</a></div>
+        </div>
+      </li>
+      <li class="st mv" data-t="14:40" data-name="移動（宿へ）">
+        <div class="t">14:40</div>
+        <div class="how">京阪 中書島→伏見稲荷 <span class="dur">約10分</span><span class="sub">駅から宿へは徒歩約4分。</span></div>
+      </li>
+      <li class="st spot" data-t="15:00" data-name="稲荷凰庵 チェックイン">
+        <div class="t">15:00</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">稲荷凰庵（Inari Ohan）チェックイン</span><span class="hook">昔ながらの風情を残して改装した京町家を、一棟まるごと2人で使う宿。予約済み。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>ホテルの客室ではなく、町家の一軒を丸ごと借りる滞在。京都の古い住まいの間取りや空気をそのまま味わえる。</p></div>
+              <div><h3>Tips</h3><ul>
+                <li>住所：京都市伏見区深草稲荷鳥居前町22-3</li>
+                <li>電話：+81 75-211-1800</li>
+                <li>チェックイン15:00〜22:00、チェックアウトは10:00まで。入り方は予約者に届く案内に従う。</li>
+                <li>京阪「伏見稲荷」駅から徒歩約4分、JR「稲荷」駅から徒歩約5分。</li>
+                <li>温泉・大浴場はないので、お風呂はこのあとのサウナで。</li>
+                <li>Wi-Fiあり。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E7%A8%B2%E8%8D%B7%E5%87%B0%E5%BA%B5%20%E4%BA%AC%E9%83%BD" target="_blank" rel="noopener">地図を開く</a></div>
+        </div>
+      </li>
+      <li class="st mv" data-t="16:00" data-name="移動（祇園四条へ）">
+        <div class="t">16:00</div>
+        <div class="how">京阪 伏見稲荷→祇園四条 <span class="dur">約15分</span><span class="sub">乗り換えなし。駅から徒歩約3分。</span></div>
+      </li>
+      <li class="st spot" data-t="16:15" data-name="ルーマプラザ（サウナ）">
+        <div class="t">16:15</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">ルーマプラザ（サウナ）</span><span class="hook">祇園の真ん中、屋上で東山を眺めながら外気浴できる、サウナ好きの定番。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>フィンランド産のサウナストーンを使ったサウナに、塩サウナ、温度違いの水風呂が2種。屋上には露天の薬湯があり、外気浴の評判がとくに高い。毎日アロマを変えたロウリュがある。</p></div>
+              <div><h3>Tips</h3><ul>
+                <li>男性専用。</li>
+                <li>ロウリュは16:30・18:30・20:30。16:15に入れば16:30の回に間に合う。</li>
+                <li>2時間コースがちょうどいい（紹介記事の時点で2,000円）。</li>
+                <li>京阪「祇園四条」駅から徒歩約3分。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%AB%E3%83%BC%E3%83%9E%E3%83%97%E3%83%A9%E3%82%B6%20%E7%A5%87%E5%9C%92" target="_blank" rel="noopener">地図を開く</a></div>
+        </div>
+        <div class="yori">
+          <div class="yori-h">別案<small>近場で済ませるなら</small></div>
+          <div class="pick"><b>伏見 力の湯</b><span class="why">天然地下水の水風呂、定期ロウリュ、外気浴あり。男女OK。平日750円、23時まで。竹田駅から徒歩圏</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BC%8F%E8%A6%8B%20%E5%8A%9B%E3%81%AE%E6%B9%AF" target="_blank" rel="noopener">地図</a></div>
+          <div class="pick"><b>伏見温泉</b><span class="why">宿の近くの昔ながらの銭湯。サウナは追加料金なしと評判。営業時間は当日確認</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BC%8F%E8%A6%8B%E6%B8%A9%E6%B3%89%20%E4%BA%AC%E9%83%BD" target="_blank" rel="noopener">地図</a></div>
+          <div class="pick"><b>サウナの梅湯<span class="badge old">今回は定休日</span></b><span class="why">京都の銭湯ブームの中心。ただし木曜定休なので11/19は入れない</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%82%B5%E3%82%A6%E3%83%8A%E3%81%AE%E6%A2%85%E6%B9%AF" target="_blank" rel="noopener">地図</a></div>
+        </div>
+      </li>
+      <li class="st spot" data-t="18:20" data-name="幕末の河原町を歩いて夕食へ">
+        <div class="t">18:20</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">幕末の河原町を歩いて夕食へ</span><span class="hook">サウナ上がりに、龍馬が暗殺された地と池田屋の跡を通って烏丸御池まで。歩いて約35分。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>祇園から夕食の店までの道に、幕末の大事件の現場が二つある。1867年に坂本龍馬と中岡慎太郎が襲われた近江屋の跡（河原町蛸薬師）と、1864年に新選組が尊攘派の志士を襲った池田屋の跡（三条河原町）。</p></div>
+              <div><h3>Tips</h3><ul>
+                <li>どちらも石碑が立つだけなので、歩きながら立ち寄る程度で十分。</li>
+                <li>疲れていたら、祇園四条→三条京阪→地下鉄東西線で烏丸御池へ（約15分）。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%9D%82%E6%9C%AC%E9%BE%8D%E9%A6%AC%20%E4%B8%AD%E5%B2%A1%E6%85%8E%E5%A4%AA%E9%83%8E%20%E9%81%AD%E9%9B%A3%E4%B9%8B%E5%9C%B0%20%E6%B2%B3%E5%8E%9F%E7%94%BA" target="_blank" rel="noopener">近江屋跡の地図</a> · <a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%B1%A0%E7%94%B0%E5%B1%8B%E9%A8%92%E5%8B%95%E4%B9%8B%E5%9D%80%20%E4%B8%89%E6%9D%A1" target="_blank" rel="noopener">池田屋跡の地図</a></div>
+        </div>
+      </li>
+      <li class="st plain" data-t="19:00" data-name="夕食">
+        <div class="t">19:00</div>
+        <div>
+          <div class="name2">夕食</div>
+          <p class="note">店は決まり次第共有。烏丸御池〜二条城のあたり。20:35には店を出る。</p>
+        </div>
+      </li>
+      <li class="st mv" data-t="20:35" data-name="移動（二条城へ）">
+        <div class="t">20:35</div>
+        <div class="how">地下鉄東西線で二条城前へ <span class="dur">約10分</span><span class="sub">最終入場は21:00。遅れないように。</span></div>
+      </li>
+      <li class="st spot" data-t="20:45" data-name="NAKED meets 二条城">
+        <div class="t">20:45</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">NAKED meets 二条城 2026</span><span class="hook">徳川家康が建て、慶喜が大政奉還を表明した、徳川の始まりと終わりの城。その夜を光で見せるアート展。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>二条城は1603年に徳川家康が築き、1867年には15代将軍・徳川慶喜がここで大政奉還を表明した。今年の展示は、1626年に後水尾天皇を城に迎えた「寛永行幸」から400年の節目。2代将軍秀忠の娘で天皇に嫁いだ徳川和子の美意識を手がかりに、着物などの「和のデザイン」を光と映像で見せる。紅葉のライトアップとあわせて楽しめる。</p></div>
+              <div><h3>Tips</h3><ul>
+                <li>開催18:00〜22:00、<strong>最終入場21:00</strong>。中を見られるのは22:00まで。</li>
+                <li>地下鉄東西線「二条城前」駅を出てすぐ。</li>
+                <li>日本語・英語の音声ガイドあり。</li>
+                <li>雨天でも開催（荒天時は中止の可能性あり）。</li>
+                <li>城内は砂利道が多いので歩きやすい靴で。夜は冷えるので上着を。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BA%8C%E6%9D%A1%E5%9F%8E%20%E4%BA%AC%E9%83%BD" target="_blank" rel="noopener">地図を開く</a></div>
+        </div>
+      </li>
+      <li class="st mv" data-t="22:00" data-name="移動（宿へ）">
+        <div class="t">22:00</div>
+        <div class="how">二条城前→東西線で三条京阪→京阪で伏見稲荷 <span class="dur">約35分</span><span class="sub">翌朝は6:50出発。荷造りは寝る前に。</span></div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 11/20 -->
+  <section class="day" id="d20" aria-labelledby="h20">
+    <h2 id="h20"><span class="d">11/20 金</span>新政府軍の寺と坐禅の朝</h2>
+    <ol class="tl">
+      <li class="st mv" data-t="6:50" data-name="宿を出発">
+        <div class="t">6:50</div>
+        <div class="how">宿を出発。JR稲荷→東福寺（1駅）＋徒歩 <span class="dur">約10分</span><span class="sub">荷造りは前夜に済ませておく。</span></div>
+      </li>
+      <li class="st spot" data-t="7:30" data-name="東福寺 早朝拝観">
+        <div class="t">7:30</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">東福寺 早朝拝観</span><span class="hook">京都屈指の紅葉の名所。木造の橋廊「通天橋」から谷を見下ろすと、紅葉が雲海のように広がる。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>宋から伝わった葉先が三つに分かれる「三ツ葉楓」は黄金色に色づく珍しい品種。重森三玲が作庭した本坊庭園も見どころ。</p></div>
+              <div><h3>幕末</h3><p>塔頭の即宗院は、西郷隆盛と僧・月照が王政復古の策を練ったと伝わる寺。鳥羽・伏見の戦いでは薩摩軍が裏山に砲列を敷いたともいわれ、戦後、西郷は戦死者524人を弔う「東征戦亡の碑」の碑文を書いた。即宗院の公開状況は当日確認。</p></div>
+              <div><h3>Tips</h3><ul>
+                <li>通常の拝観開始（8:30）より前の時間なので、人が少ない時間帯に通天橋を歩ける。</li>
+                <li>混雑時は通天橋での撮影が禁止される場合がある。</li>
+                <li>紅葉の見頃は例年11月中旬〜12月上旬。</li>
+                <li>朝は冷え込むので一枚多めに。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9D%B1%E7%A6%8F%E5%AF%BA%20%E4%BA%AC%E9%83%BD" target="_blank" rel="noopener">地図を開く</a></div>
+        </div>
+      </li>
+      <li class="st plain" data-t="9:00" data-name="朝食・休憩">
+        <div class="t">9:00</div>
+        <div>
+          <div class="name2">朝食・休憩</div>
+          <p class="note">東福寺駅周辺。</p>
+        </div>
+        <div class="yori">
+          <div class="yori-h">候補</div>
+          <div class="pick"><b>パンとコーヒーとひらりんと</b><span class="why">京町家のカフェ。7:00開店、焼きたてパンのモーニングは11:00まで。東福寺駅から徒歩約5分</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%91%E3%83%B3%E3%81%A8%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%E3%81%A8%E3%81%B2%E3%82%89%E3%82%8A%E3%82%93%E3%81%A8%20%E6%9D%B1%E7%A6%8F%E5%AF%BA" target="_blank" rel="noopener">地図</a></div>
+        </div>
+      </li>
+      <li class="st mv" data-t="9:30" data-name="移動（宿へ戻る）">
+        <div class="t">9:30</div>
+        <div class="how">宿へ戻る</div>
+      </li>
+      <li class="st plain" data-t="10:00" data-name="チェックアウト">
+        <div class="t">10:00</div>
+        <div>
+          <div class="name2">チェックアウト</div>
+          <p class="note">10:00まで。荷物を持って東福寺方面へ。</p>
+        </div>
+      </li>
+      <li class="st plain" data-t="10:30" data-name="自由時間">
+        <div class="t">10:30</div>
+        <div>
+          <div class="name2">自由時間</div>
+          <p class="note">東福寺周辺を散策。坐禅の前に軽めの昼食を。</p>
+        </div>
+        <div class="yori">
+          <div class="yori-h">寄り道</div>
+          <div class="pick"><b>Hanaアイス</b><span class="why">豆乳と白味噌のソフトクリーム。東福寺駅から徒歩3分ほど</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Hana%E3%82%A2%E3%82%A4%E3%82%B9%20%E6%9D%B1%E7%A6%8F%E5%AF%BA" target="_blank" rel="noopener">地図</a></div>
+          <div class="pick"><b>カフェ ジャニュアリー</b><span class="why">モンテクリストサンドやピスタチオのサンドイッチ。坐禅前の軽い昼食に。東福寺から徒歩3分</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%82%AB%E3%83%95%E3%82%A7%20%E3%82%B8%E3%83%A3%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AA%E3%83%BC%20%E6%9D%B1%E7%A6%8F%E5%AF%BA" target="_blank" rel="noopener">地図</a></div>
+        </div>
+      </li>
+      <li class="st spot" data-t="12:30" data-name="勝林寺 坐禅と特別拝観">
+        <div class="t">12:30</div>
+        <div class="card">
+          <details>
+            <summary><span class="name">勝林寺 坐禅と特別拝観</span><span class="hook">東福寺の塔頭（境内の小寺院）で、北の鬼門を守る「東福寺の毘沙門天」。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
+            <div class="detail">
+              <div><h3>魅力</h3><p>本堂は近衛家の大玄関を移したものと伝わる。季節の花を浮かべた「花手水」が有名で、秋は普段は扉の閉ざされた毘沙門天などの秘仏が特別公開される。約100年前に描かれた虎の大襖絵も間近で見られる。</p></div>
+              <div><h3>Tips</h3><ul>
+                <li>坐禅は初めてでも作法を丁寧に教えてもらえる。</li>
+                <li>座りやすいゆったりした服装で（スカートやタイトなパンツは避ける）。</li>
+                <li>タクシーで行く場合は東門で乗り降り（正門の南門は車両進入禁止）。</li>
+                <li>切り絵の御朱印など種類が多く、授与品も人気。</li>
+              </ul></div>
+            </div>
+          </details>
+          <div class="foot"><a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%8B%9D%E6%9E%97%E5%AF%BA%20%E6%9D%B1%E7%A6%8F%E5%AF%BA%20%E4%BA%AC%E9%83%BD" target="_blank" rel="noopener">地図を開く</a></div>
+        </div>
+      </li>
+      <li class="st plain" data-t="14:00" data-name="解散">
+        <div class="t">14:00</div>
+        <div>
+          <div class="name2">解散</div>
+          <p class="note">JR東福寺→京都は約3分。</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="story" id="story" aria-labelledby="hstory">
+    <h2 id="hstory">この旅の年表</h2>
+    <p class="lead">徳川の世の始まりから、新政府が立つまで。行く場所で起きたことを順に。</p>
+    <ol class="years">
+      <li><span class="y">1603<small>慶長8</small></span><span class="ev"><span class="side">徳川</span>徳川家康が<b>二条城</b>を築く。<br><span class="where">1日目 20:45 二条城</span></span></li>
+      <li><span class="y">1626<small>寛永3</small></span><span class="ev"><span class="side">徳川</span>後水尾天皇を二条城に迎える<b>寛永行幸</b>。中宮は秀忠の娘・徳川和子。<br><span class="where">今年のNAKEDの主題</span></span></li>
+      <li><span class="y">1864<small>元治元</small></span><span class="ev"><span class="side">幕府側</span>新選組が三条の旅館で尊攘派の志士を襲う<b>池田屋事件</b>。<br><span class="where">1日目 18:20 河原町</span></span></li>
+      <li><span class="y">1866<small>慶応2</small></span><span class="ev"><span class="side">志士</span>伏見の船宿<b>寺田屋</b>で、坂本龍馬が伏見奉行所の捕り方に襲われる。<br><span class="where">1日目 13:30 伏見</span></span></li>
+      <li><span class="y">1867<small>慶応3</small></span><span class="ev"><span class="side">徳川</span>徳川慶喜が二条城で<b>大政奉還</b>を表明。同じ年の暮れ、龍馬は<b>近江屋</b>で暗殺される。<br><span class="where">1日目 二条城・河原町</span></span></li>
+      <li><span class="y">1868<small>慶応4</small></span><span class="ev"><span class="side">新政府</span><b>鳥羽・伏見の戦い</b>。御香宮に本陣を置いた薩摩軍が、新選組の立てこもる伏見奉行所を砲撃。新政府軍が勝ち、戊辰戦争が始まる。<br><span class="where">1日目 伏見 ／ 2日目 東福寺</span></span></li>
+    </ol>
+  </section>
+
+  <section class="trend" aria-labelledby="htrend">
+    <h2 id="htrend">伏見のいま</h2>
+    <p class="lead">行程の外で知っておくと楽しいこと。営業時間は変わりやすいので、行く前に確認を。</p>
+    <div class="grp">
+      <h3>SNSの空気</h3>
+      <p>宿の近くの商店街では「動画で映える甘いもの」が強い。風船を割る水まる餅、逆さにしても落ちないソフト、おみくじ付きのくだもの串など、写真より短い動画向きのものが話題になっている。</p>
+    </div>
+    <div class="grp">
+      <h3>宿から歩いて数分</h3>
+      <p class="note" style="margin:0;font-size:13px;color:var(--muted)">駅と宿のあいだにある店。食べ歩きの店は17〜18時頃には閉まる。</p>
+      <div class="pick"><b>稲彦珈琲<span class="badge new">2025.9 開店</span></b><span class="why">「朱」がテーマのソフトクリームと珈琲。黒いソフトを竹炭コーンで</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%A8%B2%E5%BD%A6%E7%8F%88%E7%90%B2%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">地図</a></div>
+      <div class="pick"><b>まるもち家<span class="badge sns">SNSで話題</span></b><span class="why">「水まる餅」。風船を割るとぷるぷるの餅が出てくる</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E3%81%BE%E3%82%8B%E3%82%82%E3%81%A1%E5%AE%B6%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">地図</a></div>
+      <div class="pick"><b>京豆庵<span class="badge sns">SNSで話題</span></b><span class="why">逆さにしても落ちないと評判の、豆腐のソフトクリーム</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E4%BA%AC%E8%B1%86%E5%BA%B5%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">地図</a></div>
+      <div class="pick"><b>果菓 伊藤軒<span class="badge old">1864年創業の老舗</span></b><span class="why">老舗和菓子屋の「果物×お菓子」の店。おみくじ付きのくだもの串。稲荷駅から徒歩約3分</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9E%9C%E8%8F%93%20%E4%BC%8A%E8%97%A4%E8%BB%92%20%E4%BC%8F%E8%A6%8B" target="_blank" rel="noopener">地図</a></div>
+    </div>
+    <div class="grp">
+      <h3>まだ情報が少ない新しい店</h3>
+      <div class="pick"><b>碧 珈琲（Ao coffee-Inari）<span class="badge new">2026.5 開店</span></b><span class="why">宿の近くにできた新しいカフェ。詳しい紹介記事はまだ少ない</span><a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%A2%A7%E7%8F%88%E7%90%B2%20%E7%A8%B2%E8%8D%B7" target="_blank" rel="noopener">地図</a></div>
+      <div class="pick"><b>Tura（トゥーラ）</b><span class="why">伏見桃山のイタリアン。日本の食材を生かした料理とワイン。伏見で夕食をとる場合の候補</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Tura%20%E4%BC%8F%E8%A6%8B%E6%A1%83%E5%B1%B1%20%E3%82%A4%E3%82%BF%E3%83%AA%E3%82%A2%E3%83%B3" target="_blank" rel="noopener">地図</a></div>
+    </div>
+  </section>
+
+  <section class="pack" aria-labelledby="hpack">
+    <h2 id="hpack">持ち物と服装</h2>
+    <ul>
+      <li><div>歩きやすい靴<span>二条城の砂利道、寺の石段</span></div></li>
+      <li><div>上着・重ね着<span>11月下旬の京都の朝晩は冷える</span></div></li>
+      <li><div>タオル<span>銭湯にする場合</span></div></li>
+      <li><div>坐禅向けのゆったりしたズボン</div></li>
+      <li><div>交通系ICカード</div></li>
+    </ul>
+  </section>
+
+  <footer>
+    <ul>
+      <li>移動時間は目安。紅葉シーズンは駅も道路も混む。</li>
+      <li>開催時間などは2026年11月時点の公開情報に基づく。</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+(function(){
+  try{
+    var DAYS={'2026-11-19':'d19','2026-11-20':'d20'};
+    var panels={d19:document.getElementById('d19'),d20:document.getElementById('d20')};
+    var tabs=[].slice.call(document.querySelectorAll('.tab'));
+    var anchor=document.getElementById('tabs-top');
+    var nextEl=document.getElementById('next');
+    var items=[].slice.call(document.querySelectorAll('.st[data-t]'));
+    if(!panels.d19||!panels.d20||!tabs.length)return;
+
+    function jstNow(){
+      var n=new Date(Date.now()+9*3600000);
+      var p=function(v){return (v<10?'0':'')+v};
+      return {date:n.getUTCFullYear()+'-'+p(n.getUTCMonth()+1)+'-'+p(n.getUTCDate()),min:n.getUTCHours()*60+n.getUTCMinutes()};
+    }
+    function mins(s){var a=s.split(':');return (+a[0])*60+(+a[1])}
+    function dayOf(el){var s=el.closest('.day');return s?s.id:null}
+
+    function show(id,scroll){
+      if(!panels[id])return;
+      for(var k in panels)panels[k].hidden=(k!==id);
+      tabs.forEach(function(t){t.setAttribute('aria-current',t.getAttribute('data-day')===id?'true':'false')});
+      try{history.replaceState(null,'','#'+id)}catch(e){}
+      if(scroll&&anchor){
+        var y=anchor.getBoundingClientRect().top+window.pageYOffset;
+        if(window.pageYOffset>y)window.scrollTo(0,y);
+      }
+    }
+
+    function update(){
+      var now=jstNow(),today=DAYS[now.date];
+      items.forEach(function(el){
+        el.classList.remove('is-now','is-next');
+        var old=el.querySelector('.tag');if(old)old.parentNode.removeChild(old);
+      });
+      nextEl.hidden=true;
+      if(!today)return null;
+      var cur=null,nxt=null;
+      items.forEach(function(el){
+        if(dayOf(el)!==today)return;
+        if(mins(el.getAttribute('data-t'))<=now.min)cur=el;
+        else if(!nxt)nxt=el;
+      });
+      if(!nxt&&today==='d19'){nxt=items.filter(function(el){return dayOf(el)==='d20'})[0]||null}
+      function tag(el,cls,txt){
+        el.classList.add(cls);
+        var s=document.createElement('span');s.className='tag';s.textContent=txt;
+        el.querySelector('.t').appendChild(s);
+      }
+      if(cur)tag(cur,'is-now','いま');
+      if(nxt){
+        tag(nxt,'is-next','つぎ');
+        document.getElementById('next-name').textContent=nxt.getAttribute('data-name');
+        document.getElementById('next-time').textContent='（'+nxt.getAttribute('data-t')+'）';
+        nextEl._target=nxt;
+        nextEl.hidden=false;
+      }
+      return today;
+    }
+
+    tabs.forEach(function(t){
+      t.addEventListener('click',function(e){e.preventDefault();show(t.getAttribute('data-day'),true)});
+    });
+    nextEl.addEventListener('click',function(e){
+      e.preventDefault();
+      var el=nextEl._target;if(!el)return;
+      show(dayOf(el),false);
+      var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'});
+    });
+    window.addEventListener('hashchange',function(){
+      var h=location.hash.slice(1);if(panels[h])show(h,false);
+    });
+
+    var today=update();
+    var h=location.hash.slice(1);
+    show(today||(panels[h]?h:'d19'),false);
+    setInterval(update,60000);
+  }catch(e){
+    /* 失敗時は両日とも表示されたまま */
+    try{document.getElementById('d19').hidden=false;document.getElementById('d20').hidden=false}catch(_){}
+  }
+})();
+</script>
+
+</body>
+</html>
