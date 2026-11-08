@@ -175,13 +175,6 @@ summary:hover .tog{background:var(--ink);color:var(--paper)}
 .trend .grp p.note{padding-top:8px}
 .trend .grp > p:first-of-type:not(.note){padding-top:10px}
 
-/* ---- PACKING ---- */
-.pack{display:flex;flex-direction:column;gap:14px;padding-top:44px}
-.pack .sec .en .dot{color:var(--pink)}
-.pack ul{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink);counter-reset:item}
-.pack li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:10px;padding-block:11px;border-bottom:1px solid var(--rule);font-size:15px;font-weight:700;line-height:1.5;counter-increment:item}
-.pack li::before{content:counter(item,decimal-leading-zero);font-family:var(--num);font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);padding-top:3px}
-.pack li span{display:block;font-weight:500;font-size:13px;color:var(--muted)}
 
 footer{padding-top:28px;font-size:12px;color:var(--muted);line-height:1.7}
 footer ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
@@ -203,11 +196,10 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
   .story{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
   .story .sec,.story .lead{grid-column:1/5}
   .story .years{grid-column:5/13;grid-row:1/4}
-  .trend,.pack{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:18px}
-  .trend > *,.pack > *{grid-column:5/13}
-  .trend .sec,.trend .lead,.pack .sec{grid-column:1/5}
+  .trend{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:18px}
+  .trend > *{grid-column:5/13}
+  .trend .sec,.trend .lead{grid-column:1/5}
   .trend .sec{grid-row:1/3}
-  .pack .sec{grid-row:1/2}
   footer{padding-left:calc((100% + 24px) / 3)}
 }
 
@@ -539,16 +531,6 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
     </div>
   </section>
 
-  <section class="pack" aria-labelledby="hpack">
-    <h2 id="hpack" class="sec"><span class="en">PACKING LIST<span class="dot">.</span></span><span class="jp">持ち物と服装</span></h2>
-    <ul>
-      <li><div>歩きやすい靴<span>二条城の砂利道、寺の石段</span></div></li>
-      <li><div>上着・重ね着<span>11月下旬の京都の朝晩は冷える</span></div></li>
-      <li><div>タオル<span>銭湯にする場合</span></div></li>
-      <li><div>坐禅向けのゆったりしたズボン</div></li>
-      <li><div>交通系ICカード</div></li>
-    </ul>
-  </section>
 
   <footer>
     <ul>
