@@ -220,6 +220,7 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
   .kicker{animation-delay:.12s}
   @keyframes rise{from{transform:translateY(6px)}to{transform:none}}
 }
+
 </style>
 </head>
 <body>
@@ -251,8 +252,8 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
   <div id="tabs-top"></div>
   <nav class="bar" aria-label="日付の切り替え">
     <div class="tabs">
-      <a class="tab" href="#d19" data-day="d19"><b>DAY 01</b><small>11.19 木　酒蔵の町と、夜の二条城</small></a>
-      <a class="tab" href="#d20" data-day="d20"><b>DAY 02</b><small>11.20 金　紅葉の朝と、坐禅</small></a>
+      <a class="tab" href="#d19" data-day="d19"><b>DAY 01</b><small>11.19 木　伏見と二条城</small></a>
+      <a class="tab" href="#d20" data-day="d20"><b>DAY 02</b><small>11.20 金　東福寺と坐禅</small></a>
     </div>
     <a class="next" id="next" href="#d19" hidden><span class="lbl">NEXT</span><span><span id="next-name"></span><span class="nt" id="next-time"></span></span></a>
   </nav>
@@ -373,7 +374,7 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
         </div>
       </li>
       <li class="st spot" data-t="18:45" data-name="烏丸御池へ（夕食）">
-        <div class="t">18:45<span class="cat">WALK</span></div>
+        <div class="t">18:45<span class="cat">MOVE</span></div>
         <div class="card">
           <details>
             <summary><span class="name">烏丸御池へ（夕食）</span><span class="hook">地下鉄なら約15分。時間に余裕があれば、夜の河原町を歩いても約35分。</span><span class="tog" aria-hidden="true"></span><span class="sr">魅力とTips</span></summary>
@@ -523,7 +524,7 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
     <ol class="years">
       <li><span class="y">1603<small>慶長8</small></span><span class="ev"><span class="side">徳川</span>徳川家康が<b>二条城</b>を築く。<br><span class="where">1日目 20:45 二条城</span></span></li>
       <li><span class="y">1626<small>寛永3</small></span><span class="ev"><span class="side">徳川</span>後水尾天皇を二条城に迎える<b>寛永行幸</b>。中宮は秀忠の娘・徳川和子。<br><span class="where">今年のNAKEDの主題</span></span></li>
-      <li><span class="y">1864<small>元治元</small></span><span class="ev"><span class="side">幕府側</span>新選組が三条の旅館で尊攘派の志士を襲う<b>池田屋事件</b>。<br><span class="where">1日目 18:45 河原町</span></span></li>
+      <li><span class="y">1864<small>元治元</small></span><span class="ev"><span class="side">幕府側</span>新選組が三条の旅館で尊攘派の志士を襲う<b>池田屋事件</b>。<br><span class="where">1日目 18:45 河原町（歩く場合）</span></span></li>
       <li><span class="y">1866<small>慶応2</small></span><span class="ev"><span class="side">志士</span>伏見の船宿<b>寺田屋</b>で、坂本龍馬が伏見奉行所の捕り方に襲われる。<br><span class="where">1日目 13:30 伏見</span></span></li>
       <li><span class="y">1867<small>慶応3</small></span><span class="ev"><span class="side">徳川</span>徳川慶喜が二条城で<b>大政奉還</b>を表明。同じ年の暮れ、龍馬は<b>近江屋</b>で暗殺される。<br><span class="where">1日目 二条城・河原町</span></span></li>
       <li><span class="y">1868<small>慶応4</small></span><span class="ev"><span class="side">新政府</span><b>鳥羽・伏見の戦い</b>。御香宮に本陣を置いた薩摩軍が、新選組の立てこもる伏見奉行所を砲撃。新政府軍が勝ち、戊辰戦争が始まる。<br><span class="where">1日目 伏見 ／ 2日目 東福寺</span></span></li>
@@ -554,6 +555,7 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
 
   <footer>
     <ul>
+      <li>このページの公開は2026年11月30日（月）まで。</li>
       <li>移動時間は目安。紅葉シーズンは駅も道路も混む。</li>
       <li>開催時間などは2026年11月時点の公開情報に基づく。</li>
     </ul>
@@ -580,11 +582,11 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
     function mins(s){var a=s.split(':');return (+a[0])*60+(+a[1])}
     function dayOf(el){var s=el.closest('.day');return s?s.id:null}
 
-    function show(id,scroll){
+    function show(id,scroll,setHash){
       if(!panels[id])return;
       for(var k in panels)panels[k].hidden=(k!==id);
       tabs.forEach(function(t){t.setAttribute('aria-current',t.getAttribute('data-day')===id?'true':'false')});
-      try{history.replaceState(null,'','#'+id)}catch(e){}
+      if(setHash){try{history.replaceState(null,'','#'+id)}catch(e){}}
       if(scroll&&anchor){
         var y=anchor.getBoundingClientRect().top+window.pageYOffset;
         if(window.pageYOffset>y)window.scrollTo(0,y);
@@ -623,7 +625,7 @@ footer .colophon{margin:14px 0 0;font-family:var(--display);font-weight:700;font
     }
 
     tabs.forEach(function(t){
-      t.addEventListener('click',function(e){e.preventDefault();show(t.getAttribute('data-day'),true)});
+      t.addEventListener('click',function(e){e.preventDefault();show(t.getAttribute('data-day'),true,true)});
     });
     nextEl.addEventListener('click',function(e){
       e.preventDefault();
